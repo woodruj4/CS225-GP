@@ -50,9 +50,9 @@ int main()
 	};
 	vector <vector<int>> block1{
 		{0,0,0,0},
-		{0,0,1,0},
-		{0,1,1,0},
-		{0,1,0,0}
+		{0,0,0,0},
+		{0,0,0,0},
+		{1,1,1,1}
 	};
 	vector <vector<int>> block2{
 		{0,0,0,0},
@@ -73,7 +73,6 @@ int main()
 		{0,0,0,0}
 	};
 
-	int tempPos;
 	int inc = 0;
 	int x = 10;
 	int y = 0;
@@ -102,7 +101,8 @@ int main()
 	*	Finds the mField coordinates of each component of the block
 	*	
 	*/
-	while(1) {
+	bool isDone = false;
+	while(!isDone) {
 		while (testFlag == false) {
 			
 			if (randNum[1] != randNum[0]) {
@@ -119,7 +119,7 @@ int main()
 		else if (randNum[1] == 1) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					block[i][j] = block2[i][j];
+					block[i][j] = block1[i][j];
 				}
 			}
 		}
@@ -133,7 +133,7 @@ int main()
 		else if (randNum[1] == 3) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					block[i][j] = block4[i][j];
+					block[i][j] = block3[i][j];
 				}
 			}
 		}
@@ -216,7 +216,7 @@ int main()
 			}
 
 			//Code for setting a block
-			if (inc == 3) {
+			if (inc == 2) {
 				if (vFlag) {
 					for (int i = 0; i < 4; i++) {
 						cX = fCoords[0][i];
@@ -255,6 +255,34 @@ int main()
 			*	Equation for determining position:
 			*
 			*/
+			//Find a row that contains a solid line
+			int count = 0;
+			bool isComp = false;
+			int ind = 0;
+			for (int i = 19; i > -1; i--) {
+				count = 0;
+				for (int j = 5; j < 15; j++) {
+					if (mField[i][j] == 2) {
+						count++;
+						if (count > 9) {
+							isComp = true;
+						}
+					}
+				}
+				if (isComp == true) {
+					for (int j = i;j > 0; j--) {
+						for (int k = 0; k < 20; k++) {
+							//Set current row equal to previous row
+							mField[j][k] = mField[j - 1][k];
+						}
+					}
+					isComp = false;
+				}
+
+				
+			}
+			
+				
 			for (int i = 0; i < 20; i++) {
 				for (int j = 0; j < 20; j++) {
 					if (mField[i][j] == 1 || mField[i][j] == 2) {
@@ -265,6 +293,15 @@ int main()
 					}
 				}
 			}
+			/*
+			*	Scoring:
+			*	Check from the bottom up for complete lines
+			*	Store them in a 1D array with 20 indices
+			*	Shift mField 2s
+			*/
+			//Finds a row that is complete
+			
+			
 			
 		/*
 		*	Calcuations:

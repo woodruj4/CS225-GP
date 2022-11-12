@@ -6,6 +6,7 @@ using namespace std;
 #include <stdio.h>
 #include <Windows.h>
 #include <time.h>
+#include <string>
 
 int nScreenWidth = 80;			// Console Screen Size X (columns)
 int nScreenHeight = 30;			// Console Screen Size Y (rows)
@@ -15,7 +16,7 @@ int counter = 0;
 int pos = 0;
 int main()
 {
-	
+	int score = 0;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	int columns, rows;
 
@@ -49,10 +50,10 @@ int main()
 		{0,1,0,0}
 	};
 	vector <vector<int>> block1{
-		{0,0,0,0},
-		{0,0,0,0},
-		{0,0,0,0},
-		{1,1,1,1}
+		{0,0,1,0},
+		{0,0,1,0},
+		{0,0,1,0},
+		{0,0,1,0}
 	};
 	vector <vector<int>> block2{
 		{0,0,0,0},
@@ -61,10 +62,10 @@ int main()
 		{0,1,1,0}
 	};
 	vector <vector<int>> block3{
+		{0,0,0,0},
 		{0,0,1,0},
-		{0,0,1,0},
-		{0,0,1,0},
-		{0,0,1,0}
+		{0,1,1,0},
+		{0,1,0,0}
 	};
 	vector <vector<int>> block4{
 		{0,0,0,0},
@@ -92,8 +93,8 @@ int main()
 		{0,0,0,0},
 		{0,0,0,0}
 	};
-	int randNum[2] = { 0,1 };
-	srand(time(NULL));
+	int randNum[2] = { 1,1 };
+	srand(time(0));
 	//Collision Detection Code for Y-Pos
 	//Check for blocks below y-pos
 	/*
@@ -102,13 +103,14 @@ int main()
 	*	
 	*/
 	bool isDone = false;
-	while(!isDone) {
-		while (testFlag == false) {
+	while(isDone == false) {
+		/*while (testFlag == false) {
 			
 			if (randNum[1] != randNum[0]) {
 				testFlag = true;
 			}
-		}
+		}*/
+		//Choosing a block
 		if (randNum[1] == 0) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
@@ -119,7 +121,7 @@ int main()
 		else if (randNum[1] == 1) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					block[i][j] = block1[i][j];
+					block[i][j] = block2[i][j];
 				}
 			}
 		}
@@ -133,7 +135,7 @@ int main()
 		else if (randNum[1] == 3) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					block[i][j] = block3[i][j];
+					block[i][j] = block4[i][j];
 				}
 			}
 		}
@@ -216,7 +218,6 @@ int main()
 			}
 
 			//Code for setting a block
-			if (inc == 2) {
 				if (vFlag) {
 					for (int i = 0; i < 4; i++) {
 						cX = fCoords[0][i];
@@ -234,15 +235,7 @@ int main()
 					}
 					y++;
 				}
-				inc = 0;
-			}
-			else {
-				for (int i = 0; i < 4; i++) {
-					cX = fCoords[0][i];
-					cY = fCoords[1][i];
-					mField[cY][cX] = 1;
-				}
-			}
+			
 
 			if (hFlag == false && xt == 0) {
 				x--;
@@ -277,20 +270,26 @@ int main()
 						}
 					}
 					isComp = false;
+					score += 100;
 				}
-
 				
 			}
 			
 				
 			for (int i = 0; i < 20; i++) {
 				for (int j = 0; j < 20; j++) {
-					if (mField[i][j] == 1 || mField[i][j] == 2) {
+					if (mField[i][j] == 2) {
 						y_coord = fdX + i;
 						x_coord = fdY + j;
 						pos = y_coord * columns + x_coord - 1;
 						screen[pos] = L'#';
 					}
+					else if (mField[i][j] == 1) {
+						y_coord = fdX + i;
+						x_coord = fdY + j;
+						pos = y_coord * columns + x_coord - 1;
+						screen[pos] = L'@';
+					} 
 				}
 			}
 			/*
@@ -313,15 +312,32 @@ int main()
 		}
 		//Full Reset
 		y = 0;
+		randNum[1] = rand() % 4;
 		sFlag = false;
 		vFlag = false;
 		hFlag = false;
-		randNum[0] = randNum[1];
-		randNum[1] = rand() % 4;
+		
+		
 		if (lFlag == true) {
 			break;
 		}
 		
+	}
+	for (int i = 0; i < rows * columns; i++) screen[i] = L' ';
+	//Your Score: 
+	string endMsg = "Your Score: ";
+	string sScore = to_string(score);
+	for (int i = 0; i < endMsg.size(); i++) {
+		tempChar = (wchar_t)endMsg[i];
+		screen[i] = tempChar;
+	}
+	for (int i = 0; i < sScore.size(); i++) {
+		tempChar = (wchar_t)sScore[i];
+		screen[i + 80] = tempChar;
+	}
+
+	while (1) {
+		WriteConsoleOutputCharacter(hConsole, screen, rows* columns, { 0,0 }, & dwBytesWritten);
 	}
 	
 	//Code for Debugging
